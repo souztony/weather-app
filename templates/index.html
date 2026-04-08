@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clima</title>
+</head>
+<body>
+    <h1>🌤️ Buscar Clima</h1>
+
+    <form method="POST">
+        <input type="text" name="cidade" placeholder="Digite a cidade" required>
+        <button type="submit">Buscar</button>
+    </form>
+
+    {% if clima %}
+        {% if clima.erro %}
+            <p>{{ clima.erro }}</p>
+        {% else %}
+            <h2>{{ clima.cidade }}</h2>
+            <p>Temperatura: {{ clima.temperatura }}°C</p>
+            <p>Clima: {{ clima.descricao }}</p>
+        {% endif %}
+    {% endif %}
+</body>
+</html>
