@@ -1,16 +1,14 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 import requests
 
 app = Flask(__name__)
 
 def get_weather_info(code, is_day):
-    # Tradução dos códigos WMO e mapeamento para ícones do OpenWeatherMap
-    # is_day: 1 para o dia, 0 para a noite
     suffix = "d" if is_day == 1 else "n"
     
     weather_codes = {
         0: ("Céu limpo", f"01{suffix}"),
-        1: ("Principalmente limpo", f"02{suffix}"),
+        1: ("Pouco nublado", f"02{suffix}"),
         2: ("Parcialmente nublado", f"03{suffix}"),
         3: ("Nublado", f"04{suffix}"),
         45: ("Névoa", f"50{suffix}"),
@@ -44,24 +42,42 @@ def get_weather_info(code, is_day):
 # 🔹 Rota principal (buscar clima)
 @app.route("/", methods=["GET", "POST"])
 def index():
-    clima = None
-
     if request.method == "POST":
-        cidade = request.form.get("cidade")
+        cidade_input = request.form.get("cidade", "")
+        return redirect(url_for("index", cidade=cidade_input))
 
-        # 1. Obter coordenadas da cidade usando a Geocoding API do Open-Meteo
-        geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={cidade}&count=1&language=pt"
+    clima = None
+    cidade_input = request.args.get("cidade")
+
+    if cidade_input:
+
+        partes_input = [p.strip() for p in cidade_input.split(",")]
+        cidade_busca = partes_input[0]
+
+        geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={cidade_busca}&count=10&language=pt"
         geo_resposta = requests.get(geo_url)
 
         if geo_resposta.status_code == 200:
             geo_dados = geo_resposta.json()
             if "results" in geo_dados and len(geo_dados["results"]) > 0:
+                
                 resultado = geo_dados["results"][0]
+                
+                if len(partes_input) > 1:
+                    for res in geo_dados["results"]:
+                        estado = res.get("admin1", "")
+                        pais = res.get("country", "")
+                        if estado in partes_input or pais in partes_input:
+                            resultado = res
+                            break
+                            
                 lat = resultado["latitude"]
                 lon = resultado["longitude"]
-                nome_cidade = f"{resultado['name']}, {resultado.get('admin1', '')}"
-
-                # 2. Obter clima usando as coordenadas
+                
+                partes_exibicao = [resultado["name"]]
+                if resultado.get("admin1"): partes_exibicao.append(resultado["admin1"])
+                if resultado.get("country"): partes_exibicao.append(resultado["country"])
+                nome_cidade = ", ".join(partes_exibicao)
                 weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
                 weather_resposta = requests.get(weather_url)
 

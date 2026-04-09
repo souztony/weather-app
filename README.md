@@ -1,9 +1,9 @@
-# Weather App 🌍
+# 🌍 Weather App 
 
-Este é um projeto de aplicação web de previsão do tempo desenvolvido utilizando a biblioteca **Flask** e a API gratuita do **Open-Meteo**, garantindo o funcionamento imediato sem a necessidade de chaves de autenticação.
+Este é um projeto de aplicação web de previsão do tempo desenvolvido utilizando a biblioteca **Flask** e a API gratuita do **Open-Meteo**.
 
 ## Funcionalidades
-- **Busca de Clima**: Permite aos usuários obter informações em tempo real sobre a temperatura, descrição do clima e um ícone visual correspondente a qualquer cidade pesquisada.
+- **Busca de Clima**: Permite aos usuários obter informações em tempo real sobre a temperatura, descrição do clima.
 - **Sugestões de Autocomplete**: Quando o usuário começa a digitar o nome da cidade, o aplicativo sugere nomes de cidades (com estado e país) para facilitar a precisão da busca.
 - **Tratamento de Erros**: Caso o usuário insira o nome de uma cidade inexistente ou o serviço fique indisponível, um feedback de erro claro é retornado.
 
