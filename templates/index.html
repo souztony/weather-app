@@ -1,24 +1,130 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
+    <meta charset="UTF-8">
     <title>Clima</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #74b9ff, #a29bfe);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #6c5ce7;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #5a4bd6;
+        }
+
+        .resultado {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f1f2f6;
+        }
+
+        #sugestoes {
+            margin-top: 5px;
+            text-align: left;
+        }
+
+        #sugestoes div {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #sugestoes div:hover {
+            background: #dfe6e9;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>🌤️ Buscar Clima</h1>
+    <div class="container">
+        <h1>🌤️ Clima</h1>
 
-    <form method="POST">
-        <input type="text" name="cidade" placeholder="Digite a cidade" required>
-        <button type="submit">Buscar</button>
-    </form>
+        <form method="POST">
+            <input type="text" id="cidade" name="cidade" placeholder="Digite a cidade" autocomplete="off" required>
+            <div id="sugestoes"></div>
+            <button type="submit">Buscar</button>
+        </form>
 
-    {% if clima %}
-        {% if clima.erro %}
-            <p>{{ clima.erro }}</p>
-        {% else %}
-            <h2>{{ clima.cidade }}</h2>
-            <p>Temperatura: {{ clima.temperatura }}°C</p>
-            <p>Clima: {{ clima.descricao }}</p>
+        {% if clima %}
+            <div class="resultado">
+                {% if clima.erro %}
+                    <p>{{ clima.erro }}</p>
+                {% else %}
+                    <h2>{{ clima.cidade }}</h2>
+                    <p>🌡️ {{ clima.temperatura }}°C</p>
+                    <p>☁️ {{ clima.descricao }}</p>
+                {% endif %}
+            </div>
         {% endif %}
-    {% endif %}
+    </div>
+
+    <script>
+        const input = document.getElementById("cidade");
+        const sugestoes = document.getElementById("sugestoes");
+
+        input.addEventListener("input", async () => {
+            const valor = input.value;
+
+            if (valor.length < 2) {
+                sugestoes.innerHTML = "";
+                return;
+            }
+
+            const res = await fetch(`/buscar_cidades?q=${valor}`);
+            const cidades = await res.json();
+
+            sugestoes.innerHTML = "";
+
+            cidades.forEach(cidade => {
+                const div = document.createElement("div");
+                div.textContent = cidade;
+
+                div.onclick = () => {
+                    input.value = cidade;
+                    sugestoes.innerHTML = "";
+                };
+
+                sugestoes.appendChild(div);
+            });
+        });
+    </script>
 </body>
 </html>

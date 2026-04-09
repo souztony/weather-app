@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import requests
 
 app = Flask(__name__)
 
 API_KEY = "de42efaa40dd70c4ec310afa5c3bf0b2"
 
+
+# 🔹 Rota principal (buscar clima)
 @app.route("/", methods=["GET", "POST"])
 def index():
     clima = None
@@ -27,5 +29,30 @@ def index():
 
     return render_template("index.html", clima=clima)
 
+
+# 🔹 Rota para autocomplete de cidades
+@app.route("/buscar_cidades")
+def buscar_cidades():
+    query = request.args.get("q")
+
+    if not query:
+        return jsonify([])
+
+    url = f"http://api.openweathermap.org/geo/1.0/direct?q={query}&limit=5&appid={API_KEY}"
+    resposta = requests.get(url)
+
+    cidades = []
+
+    if resposta.status_code == 200:
+        dados = resposta.json()
+
+        for cidade in dados:
+            nome = f"{cidade['name']}, {cidade.get('state', '')}, {cidade['country']}"
+            cidades.append(nome)
+
+    return jsonify(cidades)
+
+
+# 🔹 Rodar servidor
 if __name__ == "__main__":
     app.run(debug=True)
