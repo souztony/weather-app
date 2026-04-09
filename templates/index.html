@@ -11,8 +11,17 @@
         <h1>🌍 Weather App</h1>
 
         <form method="POST" onsubmit="mostrarLoading()">
-            <input type="text" id="cidade" name="cidade" placeholder="Digite a cidade" autocomplete="off" required>
+            <input 
+                type="text" 
+                id="cidade" 
+                name="cidade" 
+                placeholder="Digite a cidade"
+                autocomplete="off"
+                required
+            >
+
             <div id="sugestoes"></div>
+
             <button type="submit">Buscar</button>
         </form>
 
@@ -25,10 +34,14 @@
                 {% else %}
                     <h2>{{ clima.cidade }}</h2>
 
-                    <img src="http://openweathermap.org/img/wn/{{ clima.icone }}@2x.png">
+                    <img 
+                        src="https://openweathermap.org/img/wn/{{ clima.icone }}@2x.png"
+                        class="icone-clima"
+                        alt="Ícone do clima"
+                    >
 
                     <p class="temp">{{ clima.temperatura }}°C</p>
-                    <p>{{ clima.descricao }}</p>
+                    <p class="descricao">{{ clima.descricao }}</p>
                 {% endif %}
             </div>
         {% endif %}

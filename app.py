@@ -2,12 +2,14 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
 from flask import Flask, render_template, request, jsonify
 import requests
 
 app = Flask(__name__)
 
 API_KEY = os.getenv("API_KEY")
+
 
 # 🔹 Rota principal (buscar clima)
 @app.route("/", methods=["GET", "POST"])
@@ -17,7 +19,7 @@ def index():
     if request.method == "POST":
         cidade = request.form.get("cidade")
 
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={cidade}&appid={API_KEY}&units=metric&lang=pt_br"
+        url = f"https://api.openweathermap.org/data/2.5/weather?q={cidade}&appid={API_KEY}&units=metric&lang=pt_br"
         resposta = requests.get(url)
 
         if resposta.status_code == 200:
@@ -25,7 +27,8 @@ def index():
             clima = {
                 "cidade": dados["name"],
                 "temperatura": dados["main"]["temp"],
-                "descricao": dados["weather"][0]["description"]
+                "descricao": dados["weather"][0]["description"],
+                "icone": dados["weather"][0]["icon"]  # 🔥 CORREÇÃO DO ÍCONE
             }
         else:
             clima = {"erro": "Cidade não encontrada"}
@@ -41,7 +44,7 @@ def buscar_cidades():
     if not query:
         return jsonify([])
 
-    url = f"http://api.openweathermap.org/geo/1.0/direct?q={query}&limit=5&appid={API_KEY}"
+    url = f"https://api.openweathermap.org/geo/1.0/direct?q={query}&limit=5&appid={API_KEY}"
     resposta = requests.get(url)
 
     cidades = []
