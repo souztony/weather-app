@@ -1,10 +1,13 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 from flask import Flask, render_template, request, jsonify
 import requests
 
 app = Flask(__name__)
 
-API_KEY = "de42efaa40dd70c4ec310afa5c3bf0b2"
-
+API_KEY = os.getenv("API_KEY")
 
 # 🔹 Rota principal (buscar clima)
 @app.route("/", methods=["GET", "POST"])

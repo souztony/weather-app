@@ -2,19 +2,21 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Clima</title>
+    <title>Weather App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
     <div class="container">
-        <h1>🌤️ Clima</h1>
+        <h1>🌍 Weather App</h1>
 
-        <form method="POST">
+        <form method="POST" onsubmit="mostrarLoading()">
             <input type="text" id="cidade" name="cidade" placeholder="Digite a cidade" autocomplete="off" required>
             <div id="sugestoes"></div>
             <button type="submit">Buscar</button>
         </form>
+
+        <div id="loading" class="hidden">⏳ Buscando...</div>
 
         {% if clima %}
             <div class="resultado">
@@ -22,14 +24,21 @@
                     <p>{{ clima.erro }}</p>
                 {% else %}
                     <h2>{{ clima.cidade }}</h2>
-                    <p>🌡️ {{ clima.temperatura }}°C</p>
-                    <p>☁️ {{ clima.descricao }}</p>
+
+                    <img src="http://openweathermap.org/img/wn/{{ clima.icone }}@2x.png">
+
+                    <p class="temp">{{ clima.temperatura }}°C</p>
+                    <p>{{ clima.descricao }}</p>
                 {% endif %}
             </div>
         {% endif %}
     </div>
 
     <script>
+        function mostrarLoading() {
+            document.getElementById("loading").classList.remove("hidden");
+        }
+
         const input = document.getElementById("cidade");
         const sugestoes = document.getElementById("sugestoes");
 
@@ -41,22 +50,27 @@
                 return;
             }
 
-            const res = await fetch(`/buscar_cidades?q=${valor}`);
-            const cidades = await res.json();
+            try {
+                const res = await fetch(`/buscar_cidades?q=${encodeURIComponent(valor)}`);
+                const cidades = await res.json();
 
-            sugestoes.innerHTML = "";
+                sugestoes.innerHTML = "";
 
-            cidades.forEach(cidade => {
-                const div = document.createElement("div");
-                div.textContent = cidade;
+                cidades.forEach(cidade => {
+                    const div = document.createElement("div");
+                    div.textContent = cidade;
 
-                div.onclick = () => {
-                    input.value = cidade;
-                    sugestoes.innerHTML = "";
-                };
+                    div.onclick = () => {
+                        input.value = cidade;
+                        sugestoes.innerHTML = "";
+                    };
 
-                sugestoes.appendChild(div);
-            });
+                    sugestoes.appendChild(div);
+                });
+
+            } catch (erro) {
+                console.error("Erro no autocomplete:", erro);
+            }
         });
     </script>
 </body>
